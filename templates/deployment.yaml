@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}
+  namespace: {{ .Release.Namespace }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Release.Name }}
+    spec:
+      serviceAccountName: velero-toolbox # A modifier
+      volumes:
+        - name: velero-bin
+          emptyDir: {}
+      initContainers:
+        - name: download-velero
+          image: alpine
+          command: ["/bin/sh", "-c"]
+          args:
+            - |
+              apk add --no-cache curl && \
+              curl -L "https://github.com/vmware-tanzu/velero/releases/download/v{{ .Chart.AppVersion }}/velero-v{{ .Chart.AppVersion }}-linux-amd64.tar.gz" \
+              | tar -xz -C /target --strip-components=1 velero-v{{ .Chart.AppVersion }}-linux-amd64/velero && \
+              chmod +x /target/velero
+          volumeMounts:
+            - name: velero-bin
+              mountPath: /target
+      containers:
+        - name: {{ .Release.Name }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          command: ["/bin/sh", "-c"]
+          args: ["while true; do sleep 3600; done"]
+          stdin: true
+          tty: true
+          volumeMounts:
+            - name: velero-bin
+              mountPath: /usr/local/bin/velero
+              subPath: velero
