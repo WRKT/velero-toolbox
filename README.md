@@ -21,13 +21,13 @@ A simple Helm chart to deploy a Velero CLI toolbox pod. Use this pod to interact
 git clone https://github.com/WRKT/velero-toolbox
 
 # Add the chart 
-helm install velero-toolbox ./velero-client --namespace velero --create-namespace
+helm install velero-toolbox ./velero-toolbox --namespace velero --create-namespace
 ```
 
 Verify the pod is running:
 
 ```bash
-kubectl get pods -n velero -l app=velero-toolbox
+kubectl get pods -n velero -l app=velero-toolbox # Name of the release
 ```
 
 ## Usage
