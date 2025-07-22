@@ -25,7 +25,7 @@ spec:
             - -c
             - |
               set -e
-              VELERO_VERSION="{{ .Values.velero.appVersion }}"
+              VELERO_VERSION="{{ .Values.version }}"
               DOWNLOAD_URL="https://github.com/vmware-tanzu/velero/releases/download/v${VELERO_VERSION}/velero-v${VELERO_VERSION}-linux-amd64.tar.gz"
               
               echo "Installing dependencies..."
