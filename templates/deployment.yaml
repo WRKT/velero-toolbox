@@ -20,13 +20,23 @@ spec:
       initContainers:
         - name: download-velero
           image: alpine
-          command: ["/bin/sh", "-c"]
+          command: ["/bin/sh"]
           args:
+            - -c
             - |
-              apk add --no-cache curl && \
-              curl -L "https://github.com/vmware-tanzu/velero/releases/download/v{{ .Chart.AppVersion }}/velero-v{{ .Chart.AppVersion }}-linux-amd64.tar.gz" \
-              | tar -xz -C /target --strip-components=1 velero-v{{ .Chart.AppVersion }}-linux-amd64/velero && \
+              set -e
+              VELERO_VERSION="{{ .Values.velero.appVersion }}"
+              DOWNLOAD_URL="https://github.com/vmware-tanzu/velero/releases/download/v${VELERO_VERSION}/velero-v${VELERO_VERSION}-linux-amd64.tar.gz"
+              
+              echo "Installing dependencies..."
+              apk add --no-cache curl
+              
+              echo "Downloading Velero ${VELERO_VERSION}..."
+              curl -L "${DOWNLOAD_URL}" \
+                | tar -xz -C /target --strip-components=1 "velero-v${VELERO_VERSION}-linux-amd64/velero"
+              
               chmod +x /target/velero
+              echo "Velero binary downloaded successfully"
           volumeMounts:
             - name: velero-bin
               mountPath: /target
