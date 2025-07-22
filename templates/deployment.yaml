@@ -43,8 +43,11 @@ spec:
       containers:
         - name: {{ .Release.Name }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
-          command: ["/bin/sh", "-c"]
-          args: ["while true; do sleep 3600; done"]
+          command: ["/bin/sh"]
+          args:
+            - -c 
+            - |
+              velero client config set namespace={{ .Release.Namespace }} && sleep infinity
           stdin: true
           tty: true
           volumeMounts:
